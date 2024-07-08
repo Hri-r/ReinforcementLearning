@@ -40,7 +40,8 @@ class ActorNet(keras.Model):
         config.update({
             'stat_dims': self.stat_dim,
             'action_dim': self.act_dim,
-            'hidden_units': self.hidden_units,
+            'hidden_units_dense': self.dense_units,
+            'conv_units': self.conv_units
         })
         return config
 
@@ -79,5 +80,6 @@ class CriticNet(keras.Model):
         config.update({
             'stat_dims': self.stat_dim,
             'hidden_units': self.hidden_units,
+            'conv_units': self.conv_units
         })
         return config    
