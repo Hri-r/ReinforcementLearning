@@ -5,7 +5,7 @@ import numpy as np
 from networks import ActorNet, CriticNet
 
 class PPOagent():
-    def __init__(self, statd,actd, gamma = 0.99, alpha_a = 0.0003, alpha_c = 0.0001, lam = 0.95, clipping_ratio = 0.2, updates = 20, reg = 0.01):
+    def __init__(self, statd,actd, gamma = 0.99, alpha_a = 0.00001, alpha_c = 0.0001, lam = 0.95, clipping_ratio = 0.2, updates = 20, reg = 0.01, minepsilon = 0.0001, decayrate = 0.995, epsilon = 0.1):
         self.statd = statd
         self.actd =actd
         self.gamma = gamma
@@ -22,9 +22,13 @@ class PPOagent():
         self.critic = CriticNet(self.statd)
         self.num_updates = updates
 
-    def selectAction(self, state, epsilon = 0.1):
+        self.minepsilon = minepsilon
+        self.epsilon = epsilon
+        self.decay_rate = decayrate
+
+    def selectAction(self, state):
         # state = np.reshape(state, (1, -1))
-        if(np.random.random()>epsilon):
+        if(np.random.random()>self.epsilon):
             state = np.expand_dims(state, axis = 0)
             # state = np.expand_dims(state, axis = -1)
             probs = self.actor(state).numpy()[0]
@@ -109,4 +113,5 @@ class PPOagent():
         self.actor = keras.models.load_model(actor_path, custom_objects={'ActorNet': ActorNet})
         self.critic = keras.models.load_model(critic_path, custom_objects={'CriticNet': CriticNet})
 
-            
+    def epsilon_decay(self):
+        self.epsilon=max(self.minepsilon, self.epsilon*self.decay_rate)
